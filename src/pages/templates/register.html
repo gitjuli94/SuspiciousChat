@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Welcome to Dance Hub
+{% endblock %}
+
+{% block content %}
+
+<h2>Register</h2>
+
+<form action="/register" method="post">
+Account: <br><input type="text" name="username" minlength="1" maxlength="20">
+<p>
+Password: <br><input type="password" name="password1">
+<p>
+Password again: <br><input type="password" name="password2">
+<p>
+Role:
+<select name="role">
+<option value=1> user
+<option value=2> admin
+</select>
+<p>
+<input type="submit" value="Sign Up">
+</form>
+<p>
+
+{% endblock %}
