@@ -31,9 +31,9 @@ Non-admin users are able to delete messages due to a missing validation in the d
 Add a verification step to ensure that only users with is_staff privileges (admin users) can delete messages. This can be achieved by adding a conditional check to verify the user's role before allowing access to the delete functionality.
 
 Solution is to activate these out-commented lines:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#89
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#98
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#99
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L89
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L98
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L99
 
 ## FLAW 2: A03:2021 - Injection
 
@@ -48,8 +48,8 @@ message_id = "1; DROP TABLE pages_chatmessage; --"
 The Django ORM ensures that queries are safe from malicious input by handling escaping and parameterization. Replace the raw SQL queries with Django ORM commands, which automatically escape user input to prevent injection attacks.
 
 Solution is to activate these out-commented lines and delete the raw connection.cursor() SQL query:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#93
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#94
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L93
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L94
 
 ## FLAW 3: A05:2021 - Security Misconfiguration
 
@@ -57,8 +57,8 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#94
 The application includes hardcoded credentials, such as the admin account with the username admin and an easily guessable password admin. These credentials are exposed in the source code, making them publicly accessible. This makes it easy for attackers to gain access to the admin account and exploit its elevated privileges. Hardcoding sensitive information in the source code not only compromises security but also makes it difficult to change credentials later without modifying and redeploying the application.
 
 Problems shown on these lines of code:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#17
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#25
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L17
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L25
 
 ### Fix
 - Remove hardcoded credentials from the source code.
@@ -75,10 +75,10 @@ Unauthenticated users can access the forum page and post messages. This allows u
 Add the @login_required decorator to all functions related to the forum. This ensures that only authenticated users can access these pages or post new messages. Without this decorator, the application fails to enforce proper authentication checks.
 
 Solution is to activate these out-commented lines:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#50
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#60
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#68
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#84
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L50
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L60
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L68
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L84
 
 ## FLAW 5: Security Logging and Monitoring Failures
 
@@ -95,12 +95,12 @@ Implement a logging mechanism for login attempts using a custom Django model  Fa
 You can acquire the IP address using the helper function added at the end of views.py.
 
 Solution is to activate these out-commented lines:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#4
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#37
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#38
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L4
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L37
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L38
 
 Activate class FailedLoginAttempt in models.py:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/models.py#8
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/models.py#L8
 
 Activate this get_ip function completely:
-https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#102
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L102

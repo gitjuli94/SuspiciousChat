@@ -88,10 +88,10 @@ def delete_chat(request, message_id):
     """
     # if request.user.is_staff:  # would ensure only admin users can delete messages
     try:
-        #with connection.cursor() as cursor:
-            #cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'")
-        message = ChatMessage.objects.get(id=message_id)
-        message.delete()
+        with connection.cursor() as cursor:
+            cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'")
+        #message = ChatMessage.objects.get(id=message_id)
+        #message.delete()
         return redirect("forum")
     except ChatMessage.DoesNotExist:
         return render(request, "error.html", {"message": "Message not found"})
