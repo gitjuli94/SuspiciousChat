@@ -12,12 +12,12 @@ Welcome to Dance Hub
     <li>
         <strong>{{ message.user.username }}</strong>: {{ message.content }}
         <small>{{ message.sent_at }}</small>
-        {% if request.user.is_staff %}
+
         <form action="{% url 'delete_chat' message.id %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button type="submit">Delete</button>
         </form>
-        {% endif %}
+
     </li>
     {% endfor %}
 </ul>

@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout, user_login_failed
-from .models import ChatMessage#, FailedLoginAttempt
+from .models import ChatMessage
+#from .models import FailedLoginAttempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
-
+from django.db import connection
+from django.utils.timezone import now
 
 def index(request):
     #  hard-coded users for db
@@ -33,7 +34,7 @@ def index(request):
             login(request, user)
             return redirect("index")
         else:
-            #ip_address = get_client_ip(request)
+            #ip_address = get_ip(request)
             #FailedLoginAttempt.objects.create(username=username, ip_address=ip_address, timestamp=now())
             return render(request, "error.html", {"message": "Incorrect username or password"})
     return render(request, "index.html")
@@ -87,9 +88,10 @@ def delete_chat(request, message_id):
     """
     # if request.user.is_staff:  # would ensure only admin users can delete messages
     try:
-        ChatMessage.objects.raw(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'")
-        #message = ChatMessage.objects.get(id=message_id)
-        #message.delete()
+        #with connection.cursor() as cursor:
+            #cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'")
+        message = ChatMessage.objects.get(id=message_id)
+        message.delete()
         return redirect("forum")
     except ChatMessage.DoesNotExist:
         return render(request, "error.html", {"message": "Message not found"})
