@@ -1,22 +1,28 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Welcome to Dance Hub
+Suspicious Chat Home
 {% endblock %}
 
 {% block content %}
+<h2>Suspicious Chat Home</h2>
 
-{% if session.user_name %}
-<p>You're logged in as {{ session.user_name }}</p>
-<a href="/logout">Log out</a>
+{% if request.user.is_authenticated %}
+<p>You're logged in as {{ request.user.username }}.</p>
+<a href="{% url 'logout' %}">Log out</a>
 {% else %}
+<p>Use one of the following credentials to log in:</p>
+<ul>
+    <li>username: <code>admin</code>, password: <code>admin</code></li>
+    <li>username: <code>pasi</code>, password: <code>pasi</code></li>
+</ul>
+
 <form action="/" method="POST">
-<p>Username:<br>
-<input type="text" name="username"></p>
-<p>Password:<br>
-<input type="password" name="password"></p>
-<input type="submit" value="login">
+    {% csrf_token %}
+    <p>Username:<br><input type="text" name="username"></p>
+    <p>Password:<br><input type="password" name="password"></p>
+    <button type="submit">Login</button>
 </form>
-<p>If you don't have an account, you can create a new one <a href="/register">here</a></p>
 {% endif %}
+
 {% endblock %}

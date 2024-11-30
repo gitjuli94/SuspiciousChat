@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Welcome to Dance Hub
+{% endblock %}
+
+{% block content %}
+
+<h2>Forum</h2>
+<ul>
+    {% for message in messages %}
+    <li>
+        <strong>{{ message.user.username }}</strong>: {{ message.content }}
+        <small>{{ message.sent_at }}</small>
+        {% if request.user.is_staff %}
+        <form action="{% url 'delete_chat' message.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'new_chat' %}">Add a new message</a>
+{% endblock %}

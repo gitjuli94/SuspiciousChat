@@ -1,60 +1,90 @@
-from django.contrib.auth import authenticate, login as django_login, logout as django_logout
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate, logout
+from .models import ChatMessage
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from django.db import IntegrityError
-from django.core.exceptions import PermissionDenied
-from django.middleware.csrf import get_token
-from django.http import HttpRequest
 
-# Login view
-def login_view(request: HttpRequest):
+
+def index(request):
+    #  hard-coded users for db
+    admin_user, created_admin = User.objects.get_or_create(
+        username="admin",
+        defaults={"is_staff": True, "is_superuser": True}
+    )
+    if created_admin:
+        admin_user.set_password("admin")
+        admin_user.save()
+
+    normal_user, created_user = User.objects.get_or_create(
+        username="pasi",
+        defaults={"is_staff": False, "is_superuser": False}
+    )
+    if created_user:
+        normal_user.set_password("pasi")
+        normal_user.save()
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST["username"]
+        password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            django_login(request, user)
-            request.session["user_id"] = user.id
-            request.session["user_name"] = user.username
-            request.session["user_role"] = getattr(user, "role", 0)  # Optional: If role is implemented
-            request.session["csrf_token"] = get_token(request)  # Set CSRF token in session
-            return redirect("/")  # Redirect to the homepage
+            login(request, user)
+            return redirect("index")
         else:
-            return render(request, "error.html", {"message": "Invalid username or password."})
-    return render(request, "index.html")  # Render the login page for GET requests
+            return render(request, "error.html", {"message": "Incorrect username or password"})
+    return render(request, "index.html")
 
-# Logout view
-def logout_view(request: HttpRequest):
-    django_logout(request)
-    request.session.flush()  # Clears all session data
-    return redirect("/")  # Redirect to the homepage after logout
 
-# Registration view
-def register_view(request: HttpRequest):
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')  # Redirect to the index page after logout
+
+
+@login_required
+def forum(request):
+    """
+    Forum main page where users can view messages.
+    """
+    # Fetch all chat messages from the database
+    messages = ChatMessage.objects.all().order_by('-sent_at')  # Order by newest first
+    return render(request, "forum.html", {"messages": messages})
+
+
+@login_required
+def new_chat(request):
+    """
+    Render the page to add a new chat message.
+    """
+    return render(request, "new_chat.html")
+
+
+@login_required
+def send_chat(request):
+    """
+    Handle posting of a new chat message.
+    """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
-        if password1 != password2:
-            return render(request, "error.html", {"message": "Passwords do not match."})
+        content = request.POST.get("content", "").strip()
+        if content:
+            # Create a new ChatMessage instance
+            ChatMessage.objects.create(user=request.user, content=content)
+            return redirect("forum")  # Redirect to the forum page
+        else:
+            return render(request, "error.html", {"message": "Message content cannot be empty"})
+    return redirect("forum")
+
+
+@login_required
+def delete_chat(request, message_id):
+    """
+    Allow an admin user to delete a chat message.
+    """
+    if request.user.is_staff:  # Ensure only admin users can delete messages
         try:
-            user = User.objects.create_user(username=username, password=password1)
-            # Automatically log in the user after registration
-            django_login(request, user)
-            return redirect("/")  # Redirect to the homepage after successful registration
-        except IntegrityError:
-            return render(request, "error.html", {"message": "Username already exists."})
-    return render(request, "register.html")  # Render the registration page for GET requests
-
-# Require a specific user role (utility function)
-def require_role(request: HttpRequest, role: int) -> None:
-    user_role = request.session.get("user_role", 0)
-    if not request.user.is_authenticated or role > user_role:
-        raise PermissionDenied()
-
-# Check CSRF token (utility function)
-def check_csrf(request: HttpRequest) -> None:
-    session_token = request.session.get("csrf_token", "")
-    form_token = request.POST.get("csrf_token", "")
-    if session_token != form_token:
-        raise PermissionDenied("CSRF token mismatch")
+            message = ChatMessage.objects.get(id=message_id)
+            message.delete()
+            return redirect("forum")
+        except ChatMessage.DoesNotExist:
+            return render(request, "error.html", {"message": "Message not found"})
+    else:
+        return render(request, "error.html", {"message": "Only admin users can delete messages"})
