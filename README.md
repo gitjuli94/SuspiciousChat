@@ -25,7 +25,7 @@ Below, each flaw is described along with its impact, the problematic code, and a
 ## FLAW 1: A01:2021 - Broken Access Control
 
 ### Problem
-Non-admin users are able to delete messages due to a missing validation in the delete_chat function. This flaw allows unauthorized users to perform actions that should be restricted to administrators, violating access control policies.
+Non-admin users are able to delete messages due to a missing validation in the delete_chat function. This flaw allows unauthorized users to perform actions that should be restricted to administrators, violating access control policies. If non-admin users can delete messages, they can potentially disrupt the application's functionality by removing important content. Furthermore, this can cause loss of data integrity and lead to frustration among legitimate users, as no proper checks are in place to prevent such unauthorized actions.
 
 ### Fix
 Add a verification step to ensure that only users with is_staff privileges (admin users) can delete messages. This can be achieved by adding a conditional check to verify the user's role before allowing access to the delete functionality.
@@ -38,7 +38,7 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#99
 ## FLAW 2: A03:2021 - Injection
 
 ### Problem
-In the delete_chat function, raw SQL queries are executed using unvalidated user input. Specifically, the use of cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'") directly embeds the user-provided message_id into the SQL query string. This approach makes the application vulnerable to SQL injection attacks.
+In the delete_chat function, raw SQL queries are executed using unvalidated user input. Specifically, the use of cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'") directly embeds the user-provided message_id into the SQL query string. This approach makes the application vulnerable to SQL injection attacks. Attackers can inject malicious SQL statements to alter, retrieve, or delete data they are not authorized to access. For instance, they could use the vulnerability to delete all messages in the database or retrieve sensitive data by manipulating the input parameter.
 
 An attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
 
@@ -54,7 +54,7 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#94
 ## FLAW 3: A05:2021 - Security Misconfiguration
 
 ### Problem
-The application includes hardcoded credentials, such as the admin account with the username admin and an easily guessable password admin. These credentials are exposed in the source code, making them publicly accessible.
+The application includes hardcoded credentials, such as the admin account with the username admin and an easily guessable password admin. These credentials are exposed in the source code, making them publicly accessible. This makes it easy for attackers to gain access to the admin account and exploit its elevated privileges. Hardcoding sensitive information in the source code not only compromises security but also makes it difficult to change credentials later without modifying and redeploying the application.
 
 Problems shown on these lines of code:
 https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#17
@@ -69,7 +69,7 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#25
 ## FLAW 4: A07:2021 - Identification and Authentication Failures
 
 ### Problem
-Unauthenticated users can access the forum page and post messages. This allows unauthorized individuals to interact with the application, leading to potential misuse.
+Unauthenticated users can access the forum page and post messages. This allows unauthorized individuals to interact with the application, leading to potential misuse. Such unrestricted access could result in spamming, inappropriate content, or even malicious actions like exploiting vulnerabilities in the forum. Without authentication, it is impossible to associate forum activity with legitimate users, making the application less reliable and less secure.
 
 ### Fix
 Add the @login_required decorator to all functions related to the forum. This ensures that only authenticated users can access these pages or post new messages. Without this decorator, the application fails to enforce proper authentication checks.
@@ -83,7 +83,7 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#84
 ## FLAW 5: Security Logging and Monitoring Failures
 
 ### Problem
-The application does not log login attempts, including failed attempts. This omission allows attackers to brute-force credentials without being detected, as no evidence of their attempts is captured.
+The application does not log login attempts, including failed attempts. This omission allows attackers to brute-force credentials without being detected, as no evidence of their attempts is captured. Without proper logging, it is difficult for administrators to detect suspicious activity or respond to potential attacks. Logging failed login attempts can serve as an early warning system to identify potential brute force attacks or unauthorized access attempts.
 
 ### Fix
 Implement a logging mechanism for login attempts using a custom Django model  FailedLoginAttempt. This model stores the following:
