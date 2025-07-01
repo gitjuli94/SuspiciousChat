@@ -42,7 +42,11 @@ In the delete_chat function, raw SQL queries are executed using unvalidated user
 
 An attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
 
-message_id = "1; DROP TABLE pages_chatmessage; --"
+Attacker's input:
+message_id = 0 OR 1=1
+Resulting SQL:
+DELETE FROM pages_chatmessage WHERE id = 0 OR 1=1
+Causing the query to match all rows in the table, effectively deleting all messages.
 
 ### Fix
 The Django ORM ensures that queries are safe from malicious input by handling escaping and parameterization. Replace the raw SQL queries with Django ORM commands, which automatically escape user input to prevent injection attacks.
