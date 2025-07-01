@@ -43,9 +43,13 @@ In the delete_chat function, raw SQL queries are executed using unvalidated user
 An attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
 
 Attacker's input:
-message_id = 0 OR 1=1
+```bash
+0 OR 1=1
+```
 Resulting SQL:
+```bash
 DELETE FROM pages_chatmessage WHERE id = 0 OR 1=1
+```
 Causing the query to match all rows in the table, effectively deleting all messages.
 
 ### Fix
