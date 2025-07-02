@@ -82,10 +82,11 @@ def send_chat(request):
 
 
 #@login_required
-def delete_chat(request, message_id):
+def delete_chat(request):
     """
     Allow an admin user to delete a chat message.
     """
+    message_id = request.GET.get("id", "")
     # if request.user.is_staff:  # would ensure only admin users can delete messages
     try:
         with connection.cursor() as cursor:

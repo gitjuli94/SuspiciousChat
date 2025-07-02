@@ -38,13 +38,11 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L99
 ## FLAW 2: A03:2021 - Injection
 
 ### Problem
-In the delete_chat function, raw SQL queries are executed using unvalidated user input. Specifically, the use of cursor.execute(f"DELETE FROM pages_chatmessage WHERE id = '{message_id}'") directly embeds the user-provided message_id into the SQL query string. This approach makes the application vulnerable to SQL injection attacks. Attackers can inject malicious SQL statements to alter, retrieve, or delete data they are not authorized to access. For instance, they could use the vulnerability to delete all messages in the database or retrieve sensitive data by manipulating the input parameter.
-
-An attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
+In the delete_chat function, raw SQL queries are executed using unvalidated user input retrieved from a query parameter. Because no validation or sanitization is performed, an attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
 
 Attacker's input:
 ```bash
-0 OR 1=1
+/delete_chat/?id=0 OR 1=1
 ```
 Resulting SQL:
 ```bash
