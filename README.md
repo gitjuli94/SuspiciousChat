@@ -40,9 +40,9 @@ https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L99
 ### Problem
 In the delete_chat function, raw SQL queries are executed using unvalidated user input retrieved from a query parameter. Because no validation or sanitization is performed, an attacker can craft a malicious message_id parameter to execute arbitrary SQL commands. For example:
 
-Attacker's input:
+Attacker's input on the address bar:
 ```bash
-/delete_chat/?id=0 OR 1=1
+http://127.0.0.1:8000/delete_chat/?id=0 OR 1=1
 ```
 Resulting SQL:
 ```bash
