@@ -51,9 +51,24 @@ DELETE FROM pages_chatmessage WHERE id = 0 OR 1=1
 Causing the query to match all rows in the table, effectively deleting all messages.
 
 ### Fix
+Include the message_id as a typed URL path parameter and enforce it as an integer using <int:message_id>. This blocks malicious input like SQL code from reaching the database, as only valid integers are accepted.
+
+Activate:
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/urls.py#10
+
+Comment out:
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/urls.py#9
+
 The Django ORM ensures that queries are safe from malicious input by handling escaping and parameterization. Replace the raw SQL queries with Django ORM commands, which automatically escape user input to prevent injection attacks.
 
 Solution is to activate these out-commented lines and delete the raw connection.cursor() SQL query:
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L85
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L95
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L96
+
+Comment out:
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L86
+https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L90
 https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L93
 https://github.com/gitjuli94/SuspiciousChat/blob/main/src/pages/views.py#L94
 

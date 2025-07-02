@@ -82,6 +82,7 @@ def send_chat(request):
 
 
 #@login_required
+#def delete_chat(request, message_id):
 def delete_chat(request):
     """
     Allow an admin user to delete a chat message.
